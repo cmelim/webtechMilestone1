@@ -1,31 +1,56 @@
-import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState,useRef } from 'react';
+import { View, Text, Button, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CardButton from '../components/CardButton';
 
 function MainPage({ navigation }) {
-    const handleCardClick = (destination) => {
-      navigation.navigate(destination);
-    };
-  
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
-    const toggleDropdown = () => {
-      setIsDropdownOpen(!isDropdownOpen);
-    };
-  
-    return (
+  const handleCardClick = (destination) => {
+    navigation.navigate(destination);
+  };
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const closeDropdown = () => {
+    setIsDropdownOpen(false);
+  };
+
+  const handleDropdownPress = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleDropdownItemClick = (destination) => {
+    closeDropdown();
+    navigation.navigate(destination);
+  };
+  return (
+
+    <TouchableWithoutFeedback onPress={closeDropdown}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.username}>Hello</Text>
-          <TouchableOpacity style={styles.dropdown} onPress={toggleDropdown}>
-            <Icon name="user" size={24} color="black" />
+          <Text style={styles.username}>Hello Dr Smith</Text>
+          <TouchableOpacity
+            ref={dropdownRef}
+            style={styles.dropdown}
+            onPress={handleDropdownPress}
+          >
+            <Icon name="user-md" size={24} color="black" />
             {isDropdownOpen && (
               <View style={styles.dropdownContent}>
-                <TouchableOpacity style={styles.dropdownItem} onPress={() => navigation.navigate('User Profile')}>
+                <TouchableOpacity
+                  style={styles.dropdownItem}
+                  onPress={() => handleDropdownItemClick('User Profile')}
+                >
                   <Text>Profile</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.dropdownItem}>
+                <TouchableOpacity
+                  style={styles.dropdownItem}
+                  onPress={() => handleDropdownItemClick('Login')}
+                >
                   <Text>Logout</Text>
                 </TouchableOpacity>
               </View>
@@ -51,6 +76,7 @@ function MainPage({ navigation }) {
           onPress={() => handleCardClick('ClinicalTests')}
         />
       </View>
+      </TouchableWithoutFeedback>
     );
   }
 
@@ -123,3 +149,4 @@ const styles = StyleSheet.create({
 });
 
 export default MainPage;
+
