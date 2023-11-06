@@ -6,8 +6,8 @@ function CriticalPatients({ navigation }) {
   const [searchText, setSearchText] = useState(''); // State to store the search text
   const patients = [
     { name: 'Patient 1', caseNumber: 'Case No: 12345' },
-    { name: 'Patient 2', caseNumber: 'Case No: 23456' },
-    { name: 'Patient 3', caseNumber: 'Case No: 34567' },
+    { name: 'Patient 2', caseNumber: 'Case No: 56789' },
+    { name: 'Patient 3', caseNumber: 'Case No: 987654' },
   ];
 
   const handleSearch = () => {
@@ -38,7 +38,7 @@ function CriticalPatients({ navigation }) {
               <Text style={styles.cardInfo}>{patient.caseNumber}</Text>
             </View>
             <View style={styles.cardRight}>
-              <TouchableOpacity style={styles.viewDetailsButton} onPress={() => navigation.navigate('CriticalPatientDetails')}>
+              <TouchableOpacity style={styles.viewDetailsButton} onPress={() => navigation.navigate('Critrical Patient Details')}>
                 <Text style={styles.viewDetailsButtonText}>View Details</Text>
               </TouchableOpacity>
             </View>

@@ -14,7 +14,7 @@ function SplashScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <FontAwesome name="user" size={170} color="#3349FF" />
-      <Text style={styles.appName}> Clinic Servive</Text>
+      <Text style={styles.appName}> Clinic Service</Text>
       <Text style={styles.slogan}>Care for you</Text>
     </View>
   );

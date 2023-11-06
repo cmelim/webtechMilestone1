@@ -12,7 +12,7 @@ function ViewCritricalPatientDetails({ route }) {
       <View style={styles.detailsContainer}>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Patient's Name:</Text>
-          <Text style={styles.detailInfo}>Khanjan</Text>
+          <Text style={styles.detailInfo}>Elon</Text>
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Case Number:</Text>
