@@ -50,11 +50,11 @@ function AddPatientScreen({ navigation }) {
 
     // Send a POST request to your server with the patient data
     axios
-      .post('http://10.0.2.2:3000/patients', newPatientData)
+      .post('http://localhost:8080/api/patient/', newPatientData)
       .then((response) => {
         console.log('Patient added successfully: ', response.data);
         alert('Patient added successfully');
-        navigation.navigate('AllPatients');
+        navigation.navigate('AllPatients',{ fetchPatients: true });
       })
       .catch((error) => {
         console.error('Error adding patient:', error);

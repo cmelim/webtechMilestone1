@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 
@@ -9,23 +9,79 @@ function AllPatients({ navigation }) {
 
   useEffect(() => {
     // Fetch patients from your server when the component mounts
+    /*
     axios
-      .get('http://10.0.2.2:3000/patient/list')
+      .get('http://localhost:8080/api/patient/')
       .then((response) => {
         // Log the response to inspect its structure
         console.log('Response data:', response.data);
   
-        // Check if response data has the "data" key and it's an array
-        if (Array.isArray(response.data.data)) {
-          setPatients(response.data.data); // Access the "data" key
+        if (Array.isArray(response.data)) { // Verificar si la respuesta es un array directamente
+          console.log('Ver pacientes:');
+  
+          // Convert the array of JSON objects to a JSON string
+          const patientsJSON = JSON.stringify(response.data, null, 2);
+  
+          // Log the JSON string to the console
+          console.log('Patients data in JSON format:', patientsJSON);
+  
+          setPatients(response.data);
         } else {
           console.error('Invalid data format - expected an array of patients');
         }
       })
       .catch((error) => {
         console.error('Error fetching patients:', error);
-      });
+      })/
+      
+      */
+     fetchPatients();
   }, []);
+  const fetchPatients = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/patient/');
+      if (Array.isArray(response.data)) {
+        setPatients(response.data);
+      } else {
+        console.error('Invalid data format - expected an array of patients');
+      }
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+    }
+  };
+ 
+  const handleDeletePatient = (patientId) => {
+
+    const patientToDelete = patients.find((patient) => patient._id === patientId);
+
+    Alert.alert(
+      'Confirm Deletion',
+      `Are you sure you want to delete the patient with ID: ${patientId}?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel', // Opción de cancelar
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              // Realiza una solicitud DELETE al servidor para eliminar el paciente
+              await axios.delete(`http://localhost:8080/api/patient/delete/${patientId}`);
+  
+              // Actualiza la lista de pacientes después de eliminar al paciente
+              setPatients((prevPatients) => prevPatients.filter((patient) => patient._id !== patientId));
+
+              fetchPatients();
+            } catch (error) {
+              console.error('Error deleting patient:', error);
+            }
+          },
+        },
+      ]
+    );
+  };
+  
 
   const handleSearch = () => {
     // Implement your search logic here
@@ -60,7 +116,7 @@ function AllPatients({ navigation }) {
             </View>
             <View style={styles.cardRight}>
               <View style={styles.buttonGroup}>
-                <TouchableOpacity style={styles.buttonFilled} onPress={() => { /* Handle delete user action */ }}>
+                <TouchableOpacity style={styles.buttonFilled} onPress={() => { handleDeletePatient(patient.id)}}>
                   <Icon name="trash" size={20} color="white" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.buttonFilled} onPress={() => { navigation.navigate('Edit Patient Details') }}>

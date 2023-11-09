@@ -1,5 +1,5 @@
 import React, { useState,useRef } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CardButton from '../components/CardButton';
 
@@ -57,6 +57,8 @@ function MainPage({ navigation }) {
             )}
           </TouchableOpacity>
         </View>
+        
+        <ScrollView style={styles.scrollview}>
         <CardButton
           style={styles.card} // Pass the style here
           imageSource={require('../../assets/person-care.jpg')}
@@ -75,7 +77,15 @@ function MainPage({ navigation }) {
           title="Clinical Tests"
           onPress={() => handleCardClick('ClinicalTests')}
         />
+        <CardButton
+          style={styles.card}  
+          imageSource={require('../../assets/doctors.jpg')}
+          title="Create Doctors Profile"
+          onPress={() => handleCardClick('ClinicalTests')}
+        />
+        </ScrollView>
       </View>
+      
       </TouchableWithoutFeedback>
     );
   }
@@ -142,6 +152,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 10,
     height: 800,
+  },
+  scrollview: {
+    backgroundColor: 'white',
+    width: '100%',
+    height: '100%',
+    
   },
   cardButtonText: {
     color: 'white',
