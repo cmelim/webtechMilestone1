@@ -1,115 +1,126 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity,ScrollView,SafeAreaView  } from 'react-native';
-import RadioButtonGroup from './../components/RadioButtonGroup';
+import React, {useState} from 'react';
+import {Alert, FlatList, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
-function AddClinicalTestScreen({ navigation }) {
+function AddClinicalTestScreen({ navigation, route}) {
+
+  const {patientID} = route.params;
+
+  const [date, setDate] = useState('');
+  const [bodyTemperature, setBodyTemperature] = useState('');
   const [bloodPressure, setBloodPressure] = useState('');
   const [respiratoryRate, setRespiratoryRate] = useState('');
   const [bloodOxygenLevel, setBloodOxygenLevel] = useState('');
-  const [heartbeatRate, setHeartbeatRate] = useState('');
-  const [chiefcomplaint, setChiefcomplaint] = useState('');
-  const [pastMedicalHistory, setPastMedicalHistory] = useState('');
-  const [medicalDiagnosis, setMedicalDiagnosis] = useState('');
-  const [medicalPrescription, setMedicalPrescription] = useState('');
+  const [pulseRate, setPulseRate] = useState('');
 
+  const newClinicalTestData = {
+    date,
+    bodyTemperature,
+    bloodPressure,
+    respiratoryRate,
+    bloodOxygenLevel,
+    pulseRate
+  }
   
+  const handleAddTest = () => {
 
-  const handleRegister = () => {
-    // Add your registration logic here
-    console.log('Registering with the following information:');
-    console.log('bloodPressure:', bloodPressure);
-    console.log('respiratoryRate:', respiratoryRate);
-    console.log('bloodOxygenLevel:', bloodOxygenLevel);
-    console.log('heartbeatRate:', heartbeatRate);
-    console.log('chiefcomplaint:', chiefcomplaint);
-    console.log('pastMedicalHistory:', pastMedicalHistory);
-    console.log('medicalDiagnosis:', medicalDiagnosis);
-    console.log('medicalPrescription:', medicalPrescription);
+    if (!date || !bodyTemperature || !bloodPressure || !respiratoryRate || !bloodOxygenLevel || !pulseRate ) {
+      Alert.alert('Validation Error', 'Please fill in all fields.');
+      return;
+    }
 
-    navigation.navigate('ClinicalTests');
+    // Validate date format (YYYY-MM-DD)
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+    if (!datePattern.test(date)) {
+      Alert.alert('Validation Error', 'Please enter a valid date in the format YYYY-MM-DD.');
+      return;
+    }
 
+    if (!/^\d+$/.test(bodyTemperature) || !/^\d+$/.test(respiratoryRate) || !/^\d+$/.test(bloodOxygenLevel) || !/^\d+$/.test(pulseRate)) {
+      Alert.alert('Validation Error', 'Body Temperature, Respiratory Rate,  Blood Oxygen Level and Pulse Rate should be numbers.');
+      return;
+    }
+
+    fetch(`https://customer-care-api-hf68.onrender.com/patients/${patientID._id}/tests`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newClinicalTestData),
+    })
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      console.log('Data from API:', data);
+      navigation.navigate('ClinicalTests', { patientID: patientID });
+    })
+    .catch(error => {
+      console.error('Error adding tests:', error);
+    });
   };
 
   return (
-   
-    <ScrollView style={styles.scrollView}>
-     <SafeAreaView  style={styles.container}>
-        
-      {/* <Text style={styles.heading}></Text> */}
+    <FlatList
+    style={styles.flatlist}
+    data={[{ key: 'form' }]}
+    renderItem={() => (
+    <SafeAreaView  style={styles.container}>
       <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Name:</Text>
-          <Text style={styles.detailInfo}>Frank Sinatra</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Case Number:</Text>
-          <Text style={styles.detailInfo}>123456</Text>
-        </View>
+        <Text style={styles.detailLabel}>Name:</Text>
+        <Text style={styles.detailInfo}>{patientID.firstName} {patientID.lastName}</Text>
+      </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.detailLabel}>ID Number:</Text>
+        <Text style={styles.detailInfo}>{patientID._id}</Text>
+      </View>
+      <Text style={styles.inputLabel}>Test Date</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="YYYY-MM-DD"
+        value={date}
+        onChangeText={(text) => setDate(text)}
+      />
+      <Text style={styles.inputLabel}>Body Temperature</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter Body Tempertaure (X°C)"
+        value={bodyTemperature}
+        onChangeText={(text) => setBodyTemperature(text)}
+      />
+      <Text style={styles.inputLabel}>Bloood Pressure</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter Blood Pressure (X/Y mmHg)"
         value={bloodPressure}
         onChangeText={(text) => setBloodPressure(text)}
       />
+      <Text style={styles.inputLabel}>Respiratory Rate</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter Respiratory Rate (X/min)"
         value={respiratoryRate}
         onChangeText={(text) => setRespiratoryRate(text)}
       />
+      <Text style={styles.inputLabel}>Blood Oxygen Level</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter Blood Oxygen Level (X%)"
         value={bloodOxygenLevel}
         onChangeText={(text) => setBloodOxygenLevel(text)}
       />
+      <Text style={styles.inputLabel}>Pulse Rate</Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter Heartbeat Rate (X/min)"
-        value={heartbeatRate}
-        onChangeText={(text) => setHeartbeatRate(text)}
+        placeholder="Enter Pulse Rate (Xbpm)"
+        value={pulseRate}
+        onChangeText={(text) => setPulseRate(text)}
       />
-
-      <TextInput
-        style={styles.inputForMultilines}
-        placeholder="Patient’s chief complaint"
-        value={chiefcomplaint}
-        multiline={true}
-        numberOfLines={4}
-        onChangeText={(text) => setChiefcomplaint(text)}
-      />
-      <TextInput
-        style={styles.inputForMultilines}
-        placeholder="Patient’s past medical history"
-        value={pastMedicalHistory}
-        multiline={true}
-        numberOfLines={4}
-        onChangeText={(text) => setPastMedicalHistory(text)}
-      />
-
-      <TextInput
-        style={styles.inputForMultilines}
-        placeholder="medical diagnosis"
-        value={medicalDiagnosis}
-        multiline={true}
-        numberOfLines={4}
-        onChangeText={(text) => setMedicalDiagnosis(text)}
-      />
-
-      <TextInput
-        style={styles.inputForMultilines}
-        placeholder="medical prescription"
-        value={medicalPrescription}
-        multiline={true}
-        numberOfLines={4}
-        onChangeText={(text) => setMedicalPrescription(text)}
-      />
-
-      <TouchableOpacity style={styles.loginButton} onPress={handleRegister}>
-        <Text style={styles.loginButtonText}>Add Details</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={handleAddTest}>
+        <Text style={styles.loginButtonText}>Add Test</Text>
       </TouchableOpacity>
       </SafeAreaView>
-    </ScrollView>
-   
+      )}
+      />
   );
 }
 
@@ -131,51 +142,30 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 10,
-    marginTop : 10,
-    paddingLeft: 10,
-    borderRadius: 10,
+    marginBottom: 4,
+    paddingLeft: 8,
+    borderRadius: 8,
     backgroundColor: 'white'
   },
-
-  inputForMultilines: {
-    width: 300,
-    height: 100,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 20,
-    paddingLeft: 10,
-    borderRadius: 10,
-    backgroundColor: 'white'
-  },
-
-  labelContainer: {
-    width : 300,
-    flexDirection: 'Column',
-    alignItems: 'left', // Center the labels
-    marginBottom: 10,
-  },
+  inputLabel:{
+    fontSize: 12,
+    marginTop: 8
+  }, 
   label: {
     fontSize: 16,
     marginBottom: 5,
   },
- 
   loginButton: {
     backgroundColor: '#3349FF',
     padding: 10,
     borderRadius: 10,
     width: 300,
-    marginBottom : 30
+    marginTop : 30
   },
   loginButtonText: {
     color: 'white',
     textAlign: 'center',
   },
-
-  scrollView: {
-    backgroundColor: '#EFE1E1',
-  },
-
   detailRow: {
     width: 300,
     flexDirection: 'row',
@@ -188,11 +178,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     width: '40%',
   },
-
   detailInfo: {
     fontSize: 16,
     width: '50%',
   },
+  flatlist:{
+    backgroundColor:"#EFE1E1"
+  }
 
 });
 

@@ -80,7 +80,7 @@ function EditPatientDeatails({ navigation, route }) {
       });
   };
 
-  const handleRegister = async () => {
+  const handleUpdate = async () => {
     await updateUser(patientID._id);
     // Refetch updated patient details
     fetch(`https://customer-care-api-hf68.onrender.com/patients/${patientID._id}`)
@@ -204,7 +204,7 @@ function EditPatientDeatails({ navigation, route }) {
           onChangeText={(text) => {
             setEmergencyPhoneNumber(text)}}
         />
-        <TouchableOpacity style={styles.updateButton} onPress={handleRegister}>
+        <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
           <Text style={styles.loginButtonText}>Update</Text>
         </TouchableOpacity>
         </SafeAreaView>

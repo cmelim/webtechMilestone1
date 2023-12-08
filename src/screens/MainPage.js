@@ -1,5 +1,5 @@
-import React, { useState,useRef } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, ScrollView } from 'react-native';
+import React, {useRef, useState} from 'react';
+import {Button, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CardButton from '../components/CardButton';
 
@@ -74,8 +74,8 @@ function MainPage({ navigation }) {
         <CardButton
           style={styles.card} // Pass the style here
           imageSource={require('../../assets/Blood_pressure_monitoring.jpg')}
-          title="Clinical Tests"
-          onPress={() => handleCardClick('ClinicalTests')}
+          title="Patients Clinical Tests"
+          onPress={() => handleCardClick('PatientsClinicalTests')}
         />
         <CardButton
           style={styles.card}  
