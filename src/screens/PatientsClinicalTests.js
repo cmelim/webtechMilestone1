@@ -3,7 +3,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-function AllPatients({ navigation }) {
+function PatientsClinicalTests({ navigation }) {
   const [searchText, setSearchText] = useState('');
   const [patients, setPatients] = useState([]); // State to store the list of patients
   const [originalPatients, setOriginalPatients] = useState([]);
@@ -27,26 +27,6 @@ function AllPatients({ navigation }) {
     }
   }, [searchText, originalPatients]);
 
-  // Delete a patient
-  const deleteUser = (userId) => {
-    fetch(`https://customer-care-api-hf68.onrender.com/patients/${userId}`, {
-      method: 'DELETE',
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        // Handle success (e.g., update state, show a success message)
-        console.log('User deleted successfully');
-        // Reload the screen by fetching the updated patient list
-        fetchPatients();
-      })
-      .catch(error => {
-        // Handle error (e.g., show an error message)
-        console.error('Error deleting user:', error);
-      });
-  };
-
   // Fetches the patient list
   const fetchPatients = useCallback(() => {
     fetch('https://customer-care-api-hf68.onrender.com/patients')
@@ -56,12 +36,17 @@ function AllPatients({ navigation }) {
           ...patient,
           formattedPhoneNumber: `+1 (${patient.phoneNumber.toString().slice(0, 3)}) ${patient.phoneNumber.toString().slice(3, 6)}-${patient.phoneNumber.toString().slice(6)}`
         }));
+
         setPatients(formattedPatients);
         // Save the original list of patients
         setOriginalPatients(formattedPatients);
       })
       .catch(error => console.error('Error fetching data:', error));
   }, []);
+
+  const dateOptions = {
+    timeZone: 'UTC',
+  };
 
   // Load the list of patients
   useEffect(() => {
@@ -82,13 +67,14 @@ function AllPatients({ navigation }) {
     }, [fetchPatients])
   );
 
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.searchBar}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search Patients by name or email"
+            placeholder="Search Patient"
             value={searchText}
             onChangeText={(text) => setSearchText(text)}
           />
@@ -96,28 +82,20 @@ function AllPatients({ navigation }) {
             <Icon name="search" size={20} color="gray" />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddPatients')}>
-          <Icon name="user-plus" size={17} color="white" />
-        </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.cardContainer}>
         {patients.map((patient, index) => (
           <View style={styles.card} key={index}>
             <View style={styles.cardLeft}>
               <Text style={styles.cardName}>{patient.firstName} {patient.lastName}</Text>
-              <Text style={styles.cardInfo}>{patient.address}</Text>
-              <Text style={styles.cardInfo}>{patient.email}</Text>
-              <Text style={styles.cardInfo}>{patient.formattedPhoneNumber}</Text>
+              <Text style={styles.cardInfo}>Number of Tests: {patient.tests.length}</Text>
             </View>
             <View style={styles.cardRight}>
               <View style={styles.buttonGroup}>
-                <TouchableOpacity style={styles.buttonFilled}  onPress={() => deleteUser(patient._id)}>
-                  <Icon name="trash" size={20} color="white" />
+                <TouchableOpacity style={styles.buttonFilled} onPress={() => navigation.navigate('ClinicalTests', { patientID: patient })}>
+                  <Icon name="eye" size={17} color="white" />
                 </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.viewDetailsButton} onPress={() => navigation.navigate('Patient Details', { patientID: patient })}>
-                <Text style={styles.viewDetailsButtonText}>View Details</Text>
-              </TouchableOpacity>
             </View>
           </View>
         ))}
@@ -125,6 +103,21 @@ function AllPatients({ navigation }) {
     </View>
   );
 }
+
+function getLatestTestDate(tests) {
+  if (!tests || tests.length === 0) {
+    return 'No tests available';
+  }
+
+  // Assuming that each test has a 'date' property
+  const latestTest = tests.reduce((latest, test) => (test.date > latest ? test.date : latest), tests[0].date);
+
+  // Format the date as needed (you may want to use a library like moment.js)
+  const formattedDate = new Date(latestTest).toLocaleDateString();
+
+  return formattedDate;
+}
+
 
 const styles = StyleSheet.create({
   container: {
@@ -138,7 +131,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     padding: 10,
-    marginTop: 20,
+    marginTop: 8,
   },
   searchBar: {
     flex: 1,
@@ -147,7 +140,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     height: 40,
-    marginRight: 10,
   },
   searchInput: {
     flex: 1,
@@ -156,14 +148,6 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     padding: 10,
-  },
-  addButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#3349FF',
-    borderRadius: 50,
-    width: 40,
-    height: 40,
   },
   cardContainer: {
     flexDirection: 'row',
@@ -189,12 +173,12 @@ const styles = StyleSheet.create({
   },
   cardName: {
     fontSize: 18,
-    paddingBottom: 8,
+    paddingBottom: 5,
     fontWeight: 'bold',
   },
   cardInfo: {
     fontSize: 16,
-    paddingBottom: 4,
+    paddingTop: 5,
   },
   buttonGroup: {
     padding: 8,
@@ -213,16 +197,6 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
   },
-  viewDetailsButton: {
-    backgroundColor: '#3349FF',
-    borderRadius: 8,
-    padding: 8,
-    margin: 8,
-  },
-  viewDetailsButtonText: {
-    color: 'white',
-    textAlign: 'center',
-  },
 });
 
-export default AllPatients;
+export default PatientsClinicalTests;
